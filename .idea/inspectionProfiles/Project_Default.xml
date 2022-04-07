@@ -1,0 +1,46 @@
+<component name="InspectionProjectProfileManager">
+  <profile version="1.0">
+    <option name="myName" value="Project Default" />
+    <inspection_tool class="PyPackageRequirementsInspection" enabled="true" level="WARNING" enabled_by_default="true">
+      <option name="ignoredPackages">
+        <value>
+          <list size="25">
+            <item index="0" class="java.lang.String" itemvalue="opentok" />
+            <item index="1" class="java.lang.String" itemvalue="oauth2client" />
+            <item index="2" class="java.lang.String" itemvalue="geopy" />
+            <item index="3" class="java.lang.String" itemvalue="firebase-admin" />
+            <item index="4" class="java.lang.String" itemvalue="python-dotenv" />
+            <item index="5" class="java.lang.String" itemvalue="psycopg2-binary" />
+            <item index="6" class="java.lang.String" itemvalue="python_http_client" />
+            <item index="7" class="java.lang.String" itemvalue="sendgrid" />
+            <item index="8" class="java.lang.String" itemvalue="drf-yasg" />
+            <item index="9" class="java.lang.String" itemvalue="APScheduler" />
+            <item index="10" class="java.lang.String" itemvalue="django_model_utils" />
+            <item index="11" class="java.lang.String" itemvalue="django-filter" />
+            <item index="12" class="java.lang.String" itemvalue="Django" />
+            <item index="13" class="java.lang.String" itemvalue="fcm_django" />
+            <item index="14" class="java.lang.String" itemvalue="uwsgi" />
+            <item index="15" class="java.lang.String" itemvalue="djangorestframework" />
+            <item index="16" class="java.lang.String" itemvalue="django-cors-headers" />
+            <item index="17" class="java.lang.String" itemvalue="djangorestframework_simplejwt" />
+            <item index="18" class="java.lang.String" itemvalue="django-model-utils" />
+            <item index="19" class="java.lang.String" itemvalue="PyJWT" />
+            <item index="20" class="java.lang.String" itemvalue="boto3" />
+            <item index="21" class="java.lang.String" itemvalue="django-oauth-toolkit" />
+            <item index="22" class="java.lang.String" itemvalue="pyfcm" />
+            <item index="23" class="java.lang.String" itemvalue="stripe" />
+            <item index="24" class="java.lang.String" itemvalue="django-rest-framework-social-oauth2" />
+          </list>
+        </value>
+      </option>
+    </inspection_tool>
+    <inspection_tool class="PyPep8NamingInspection" enabled="true" level="WEAK WARNING" enabled_by_default="true">
+      <option name="ignoredErrors">
+        <list>
+          <option value="N802" />
+          <option value="N803" />
+        </list>
+      </option>
+    </inspection_tool>
+  </profile>
+</component>
