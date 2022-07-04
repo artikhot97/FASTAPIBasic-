@@ -6,23 +6,21 @@ from app.users.schemas import UserCreate, UserLoginSchema, UserUpdateSchema, Sho
 from app.db.session import get_db
 from app.users.auth import (create_new_user, check_user, create_access_token, authenticate_user,
                             get_list_of_user, get_user_detail, update_user_by_id, delete_user_by_id)
-from app.authentication import JWTBearer
+from app.users.auth import get_current_user
+from fastapi.security import  OAuth2PasswordRequestForm
+from app.users.models import User
 
 router = APIRouter()
 
 
-# pagination
-
-
 @router.get("/")
 def index():
-    return {"Welcome Dear..!!"}
+    return {"Welcome to Learn FastAPI ...!!"}
 
 
-@router.post("/users/signup")
+@router.post("/users/signup", status_code=200)
 def user_signup(user: UserCreate, db: Session = Depends(get_db)):
     user = create_new_user(user=user, db=db)
-    print(user)
     if user:
         jwt = create_access_token(user.email)
         data = {
@@ -40,8 +38,8 @@ def user_signup(user: UserCreate, db: Session = Depends(get_db)):
 
 
 @router.post("/users/login")
-def user_jwt_login(user: UserLoginSchema, db: Session = Depends(get_db), response_model=ShowUser):
-    user = authenticate_user(db, user.email, user.password)
+def user_jwt_login(request: OAuth2PasswordRequestForm = Depends(), db: Session = Depends(get_db)):
+    user = authenticate_user(db, request.username, request.password)
     if not user:
         return HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
@@ -59,7 +57,7 @@ def user_jwt_login(user: UserLoginSchema, db: Session = Depends(get_db), respons
 
 
 @router.get("/users/getAllUsersList")
-def get_all_users(db: Session = Depends(get_db)):
+def get_all_users(db: Session = Depends(get_db), current_user : User = Depends(get_current_user)):
     users = get_list_of_user(db)
     data_list = list()
     if users:
@@ -75,27 +73,19 @@ def get_all_users(db: Session = Depends(get_db)):
         return data_list
 
 
-@router.get("/users/getUserDetail/{id}")
-def get_all_users(id: int, db: Session = Depends(get_db)):
+@router.get("/users/getUserDetail/{id}", response_model=ShowUser)
+def get_all_users(id: int, db: Session = Depends(get_db),current_user : User = Depends(get_current_user)):
     users = get_user_detail(id, db)
-    if users:
-        data = {
-            "id": users.id,
-            "email": users.email,
-            "username": users.username,
-            "is_active": users.is_active,
-            "is_superuser": users.is_superuser,
-        }
-        return data
-    else:
+    if not users:
         return HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
             detail=f"User does not exist",
         )
+    return users
 
 
 @router.patch("/users/updateUserDetail/{id}/")
-def update_user_detail(id: int, user: UserUpdateSchema, db: Session = Depends(get_db)):
+def update_user_detail(id: int, user: UserUpdateSchema, db: Session = Depends(get_db), current_user : User = Depends(get_current_user)):
     message = update_user_by_id(id, user, db)
     if not message:
         raise HTTPException(
@@ -105,7 +95,7 @@ def update_user_detail(id: int, user: UserUpdateSchema, db: Session = Depends(ge
 
 
 @router.delete("/users/deleteUser/{id}")
-def delete_job(id: int, db: Session = Depends(get_db)):
+def delete_job(id: int, db: Session = Depends(get_db), current_user : User = Depends(get_current_user)):
     user_exist = get_user_detail(id=id, db=db)
     if not user_exist:
         return HTTPException(

@@ -3,11 +3,13 @@ from app.users.schemas import UserCreate, UserUpdateSchema
 from app.core.hashing import Hasher
 from datetime import datetime, timedelta
 import os
-from jose import jwt
+from jose import jwt, JWTError
 from typing import Union
 from dotenv import load_dotenv
 from app.users.models import User
-from fastapi import Request
+from fastapi import HTTPException, status, Depends
+from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
+from app.authentication import JWTBearer, verify_token
 
 load_dotenv()
 
@@ -16,6 +18,8 @@ JWT_REFRESH_SECRET_KEY = os.getenv("JWT_REFRESH_SECRET_KEY")
 ALGORITHM = os.getenv("ALGORITHM")
 ACCESS_TOKEN_EXPIRE_MINUTES = os.getenv("ACCESS_TOKEN_EXPIRE_MINUTES")
 REFRESH_TOKEN_EXPIRE_MINUTES = os.getenv("REFRESH_TOKEN_EXPIRE_MINUTES")
+
+oauth2_scheme = OAuth2PasswordBearer(tokenUrl="login")
 
 
 def check_is_exist(user: UserCreate, db: Session):
@@ -74,12 +78,12 @@ def delete_user_by_id(id: int, db: Session):
 
 def authenticate_user(db: Session, email: str, password: str):
     user = check_user(email, db)
-    print(not user)
     if not user:
         return False
     if not Hasher.verify_password(password, user.hashed_password):
         return False
     return user
+
 
 #
 # async def get_current_active_user(current_user: User = Depends(get_current_user)):
@@ -102,7 +106,7 @@ def create_new_user(user: UserCreate, db: Session):
 
 
 def create_access_token(data: dict):
-    expires_delta= ACCESS_TOKEN_EXPIRE_MINUTES
+    expires_delta = ACCESS_TOKEN_EXPIRE_MINUTES
     if expires_delta:
         expire = datetime.utcnow() + timedelta(minutes=int(expires_delta))
     else:
@@ -129,3 +133,16 @@ def create_refresh_token(subject: Union[str, None], expires_delta: int = None) -
     to_encode = {"exp": expires_delta, "sub": str(subject)}
     encoded_jwt = jwt.encode(to_encode, JWT_REFRESH_SECRET_KEY, ALGORITHM)
     return encoded_jwt
+
+
+async def get_current_user(token: str = Depends(oauth2_scheme)):
+    credentials_exception = HTTPException(
+        status_code=status.HTTP_401_UNAUTHORIZED,
+        detail="Could not validate credentials",
+        headers={"WWW-Authenticate": "Bearer"},
+    )
+    print(token)
+
+    return verify_token(token, credentials_exception)
+
+

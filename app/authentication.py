@@ -4,6 +4,7 @@ from dotenv import load_dotenv
 from fastapi import Request, HTTPException
 from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 import time
+from app.users.schemas import TokenData
 
 load_dotenv()
 
@@ -38,7 +39,7 @@ class JWTBearer(HTTPBearer):
         else:
             raise HTTPException(status_code=403, detail="Invalid authorization code.")
 
-    def verify_jwt(self, jwt_token: str) -> bool:
+    def verify_jwt(self, jwt_token: str) :
         isTokenValid: bool = False
         try:
             payload = decodeJWT(jwt_token)
@@ -47,3 +48,14 @@ class JWTBearer(HTTPBearer):
         if payload:
             isTokenValid = True
         return isTokenValid
+
+
+def verify_token(token:str, credentials_exception):
+    try:
+        payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
+        email: str = payload.get("email")
+        if email is None:
+            raise credentials_exception
+        token_data = TokenData(email=email)
+    except JWTError:
+        raise credentials_exception

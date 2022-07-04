@@ -31,10 +31,14 @@ class UserUpdateSchema(BaseModel):
 
 
 class ShowUser(BaseModel):
+    id : int
     username: str
-    email: EmailStr
+    email: str
     is_active: bool
+    is_superuser:bool
 
     class Config:  # to convert non dict obj to json
         orm_mode = True
 
+class TokenData(BaseModel):
+    email: EmailStr
